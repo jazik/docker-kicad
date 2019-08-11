@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ "$1" == "-h" ]; then
+    echo "Usage: $0 [<KiCad release> <Ubuntu release>]"
+    echo "Example: $0 5.1 19.04"
+    echo ""
+    echo "Start localy build container image with KiCad, if script is executed"
+    echo "without parameters default label is used. Current user home is mapped"
+    echo "into container running with same local user."
+    exit 1
+fi
+
+# if an argument is passed image with label passed as argument is
+# started, else latest image is used
+if [ "$#" == "2" ]; then
+    KICAD_REL=$1
+    UBUNTU_VER=$2
+    LABEL=:${KICAD_REL}_${UBUNTU_VER} 
+else
+    LABEL=:latest
+fi
+
+xhost +
+docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME:/home/$USER docker-kicad$LABEL
+

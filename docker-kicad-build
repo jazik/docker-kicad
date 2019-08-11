@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# kicked release branch in https://launchpad.net/~js-reynaud
+KICAD_REL=5.1
+# specific package release such as 5.1.4-201908052210+e60b266~84~ubuntu19.04.1
+# taken from https://launchpad.net/~js-reynaud/+archive/ubuntu/kicad-5.1
+# if left empty latest is used
+KICAD_VER=
+# ubuntu base image
+UBUNTU_VER=19.04
+
+if [ "$1" == "-h" ]; then
+    echo "Usage: $0 [<KiCad release> <Ubuntu release>]"
+    echo "Example: $0 5.1 19.04"
+    echo ""
+    echo "Build local container image with KiCad, if script is executed"
+    echo "without parameters decfaul KiCad 5.1 with Ubuntu 19.04 is created"
+    exit 1
+fi
+
+if [ "$#" == "2" ]; then
+    KICAD_REL=$1
+    UBUNTU_VER=$2
+    LABEL=:${KICAD_REL}_${UBUNTU_VER} 
+else
+    LABEL=:latest
+fi
+
+docker build \
+    --build-arg KICAD_REL=$KICAD_REL \
+    --build-arg KICAD_VER=$KICAD_VER \
+    --build-arg UBUNTU_VER=$UBUNTU_VER \
+    --build-arg USER=$USER \
+    --build-arg USER_ID=$(id -u) \
+    --build-arg USER_GID=$(id -g) \
+    -t docker-kicad$LABEL \
+    .
+
